@@ -15,6 +15,8 @@ devcall	ethinit (
 	  struct dentry *devptr
 	)
 {
+	// UTM Patch Workaround: skip ethinit altogether
+	return OK;
 	struct	ethcblk *ethptr;
 	int32	dinfo;			/* device information		*/
 
