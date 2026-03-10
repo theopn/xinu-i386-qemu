@@ -1,7 +1,7 @@
 #########################################################################
 #									#
 #									#
-#  Makefile for the VBOX version of Xinu, using as much as possible	#
+#  Makefile for the QEMU version of Xinu, using as much as possible	#
 #			from the Galileo code				#
 #									#
 #  includes: .deps and .defs						#
@@ -10,7 +10,7 @@
 #########################################################################
 
 COMPILER_ROOT	=	/usr/bin/
-PNAME		=	Vbox
+PNAME		=	QEMU
 PLAT		=	Platform_$(PNAME)
 TOPDIR		=	..
 
@@ -106,14 +106,11 @@ export
 #--------------------------------------------------------------------------------
 
 # The following inserts 'echo' when run on xinu00
-ECHO$(MACHINE) = echo; echo "On Vbox, the following command would be run:  "
+ECHO$(MACHINE) = echo; echo "On QEMU, the following command would be run:  "
 
 xinu:	Makefile rebuild $(BLDDIRS) $(DEFSFILE) $(DEPSFILE) $(CONFH) $(CONFC) $(LD_LIST)
 	@echo;echo 'Loading object files to produce GRUB bootable xinu'
 	@$(LD) $(LDFLAGS) $(LD_LIST) -o $(XINU)
-	@echo Copying xinu.elf to xinu.boot in the TFTP directory.
-	@$(ECHOxinu00) cp xinu.elf /srv/tftp/xinu.boot
-	@echo
 	
 
 $(BLDDIRS): 
