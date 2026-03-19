@@ -27,10 +27,10 @@ status 	_82545EMInit(
 	/* Read PCI configuration information */
 	/* Read I/O base address */
 
-	pci_bios_read_config_dword(ethptr->pcidev, E1000_PCI_IOBASE,
+	pci_bios_read_config_dword(ethptr->pcidev, E1000_PCI_MEMBASE,
 			(uint32 *)&ethptr->iobase);
-	ethptr->iobase &= ~1;
-	ethptr->iobase &= 0xffff; /* the low bit is set to indicate I/O */
+	ethptr->iobase &= ~0xf;         /* clear last 4 bits for memory flags */
+	ethptr->iobase &= 0xffffffff; /* memory-mapped I/O uses all 32 bits */
 
 	/* Read interrupt line number */
 
