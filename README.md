@@ -1,24 +1,38 @@
-# Xinu for QEMU
+# XINU for QEMU
 
-This is a version of Xinu using i386 and Intel 83545EM network driver 
+This is a port of XINU with a support for the i386 architecture and the Intel 83545EM network controller.
 
 ## Compilation
 
-Dependencies:
+**Dependencies**
 
--
+- `gnumake`
+- `gcc` (version 4.8)
+- `ld`
+- `objcopy`
+- `flex`    (required for `config/Makefile`)
+- `bison`   (required for `config/Makefile`)
 
-## QEMU Command
+`cd` into `compile` directory and run `make`.
+
+Since the developer of this patch is a NixOS user, you can use the following command to install all dependencies and compile.
 
 ```sh
-qemu-system-i386 -nographic -kernel xinu.elf -netdev user,id=n0 -device e1000-82545em,netdev=n0
+nix-shell -p gnumake gcc_multi flex bison --run "make COMPILER_ROOT='' CC=gcc"
 ```
 
-`-nographic` option emulates serial console where Xinu writes the output to. See [Xinu docs invocation chapter](https://www.qemu.org/docs/master/system/invocation.html) for more information.
+## Running XINU with QEMU
 
-Other network backend may work, though `user` is the most standard.
-See [QEMU Wiki entry for networking](https://wiki.qemu.org/Documentation/Networking) for more information.
+Use the following command in `compile` directory to boot the XINU kernel:
 
-Do make sure that network device is properly configured, as network initialization is the core part of initialization and the Xinu will hang or panic without it.
-See [system/initialize.c](./system/initialize.c) for more information.
+```sh
+qemu-system-i386 -nographic -kernel xinu.elf -netdev user,id=mynetdev -device e1000-82545em,netdev=mynetdev
+```
+
+- `-nographic`: Emulates a serial console, which is where XINU directs its output.
+    See the [QEMU invocation documentation](https://www.qemu.org/docs/master/system/invocation.html) for details.
+- Other network backend may work, though `user` is the standard.
+    For more complex setups, refer to the [QEMU Wiki entry for networking](https://wiki.qemu.org/Documentation/Networking).
+- **Since network initialization is a core part of the XINU boot process, the system may hang or panic if the `e1000-82545em` is missing or misconfigured.**
+    See the [system/initialize.c](./system/initialize.c) for the implementation details.
 
