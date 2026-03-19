@@ -12,7 +12,7 @@
 #define E1000_PCI_IOBASE 	0x18
 #define E1000_PCI_IRQ 		0x3C
 
-#define E1000_PCI_CMD_MASK	0x0005
+#define E1000_PCI_CMD_MASK	0x0007
 
 #define E1000_IO_IOADDR		0x0000
 #define E1000_IO_IODATA		0x0004
@@ -66,8 +66,7 @@ static 	inline 	void 	eth_io_writel(
 	uint32 	val
 	)
 {
-	outl(iobase + E1000_IO_IOADDR, reg);
-	outl(iobase + E1000_IO_IODATA, val);
+	*(volatile uint32 *)(iobase + reg) = val;
 }
 
 static 	inline 	uint32 	eth_io_readl(
@@ -75,8 +74,7 @@ static 	inline 	uint32 	eth_io_readl(
 	uint32 	reg
 	)
 {
-	outl(iobase + E1000_IO_IOADDR, reg);
-	return inl(iobase + E1000_IO_IODATA);
+	return *(volatile uint32 *)(iobase + reg);
 }
 
 #define eth_io_flush(iobase)  						\
