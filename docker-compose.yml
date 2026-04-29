@@ -1,0 +1,9 @@
+services:
+  xinu-compile:
+    build: .
+    environment:
+      - USER=${USER:-unknown_user}
+    volumes:
+      - .:/xinu:Z
+    stdin_open: true
+    tty: true
