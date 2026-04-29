@@ -14,7 +14,7 @@ PNAME		=	QEMU
 PLAT		=	Platform_$(PNAME)
 TOPDIR		=	..
 
-CC		=	${COMPILER_ROOT}gcc-4.8
+CC		=	${COMPILER_ROOT}gcc
 LD		=	${COMPILER_ROOT}ld
 OBJCOPY		=	${COMPILER_ROOT}objcopy
 XINU		=	$(TOPDIR)/compile/xinu.elf
