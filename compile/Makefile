@@ -9,7 +9,7 @@
 #									#
 #########################################################################
 
-COMPILER_ROOT	=	/usr/bin/
+COMPILER_ROOT	?=	/usr/bin/
 PNAME		=	QEMU
 PLAT		=	Platform_$(PNAME)
 TOPDIR		=	..
