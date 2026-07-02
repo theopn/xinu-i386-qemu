@@ -15,7 +15,7 @@ The included `Dockerfile` provides a pre-configured Debian-based environment wit
 docker compose up -d --build
 
 # 2. Enter the Docker container shell
-docker compose exec xinu-dev bash
+docker compose exec xinu-compile bash
 
 # 3. Inside the container, compile the kernel
 cd compile
