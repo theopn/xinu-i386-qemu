@@ -1,0 +1,60 @@
+name: Build i686 Cross-Compilers
+
+on:
+  workflow_dispatch: # Allows manual triggering from the Actions tab
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false # Prevents one failure from cancelling the others
+      matrix:
+        os: [ubuntu-22.04, macos-13, macos-14]
+
+    steps:
+      - name: Install Build Dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
+
+      - name: Install Build Dependencies (macOS)
+        if: runner.os == 'macOS'
+        env:
+          HOMEBREW_NO_REQUIRE_TAP_TRUST: 1 # Bypasses the GitHub runner AWS tap issue
+        run: brew install gcc binutils gmp mpfr libmpc texinfo flex bison
+
+      - name: Download GCC and Binutils Source
+        run: |
+          wget https://ftp.gnu.org/gnu/binutils/binutils-2.42.tar.gz
+          wget https://ftp.gnu.org/gnu/gcc/gcc-13.3.0/gcc-13.3.0.tar.gz
+          tar -xf binutils-2.42.tar.gz
+          tar -xf gcc-13.3.0.tar.gz
+
+          # Tell GCC to fetch and bundle its own math libraries locally
+          cd gcc-13.3.0
+          ./contrib/download_prerequisites
+
+      - name: Build Binutils
+        run: |
+          mkdir build-binutils && cd build-binutils
+          ../binutils-2.42/configure --target=i686-elf --prefix=$GITHUB_WORKSPACE/xinu-toolchain --with-sysroot --disable-nls --disable-werror
+          make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+          make install-strip
+
+      - name: Build GCC (Freestanding C Compiler)
+        run: |
+          export PATH="$GITHUB_WORKSPACE/xinu-toolchain/bin:$PATH"
+          mkdir build-gcc && cd build-gcc
+          ../gcc-13.3.0/configure --target=i686-elf --prefix=$GITHUB_WORKSPACE/xinu-toolchain --disable-nls --enable-languages=c --without-headers
+          make all-gcc -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+          make install-strip-gcc
+
+      - name: Package Toolchain
+        run: |
+          tar -czvf i686-elf-toolchain-${{ matrix.os }}.tar.gz -C xinu-toolchain .
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: i686-elf-toolchain-${{ matrix.os }}
+          path: i686-elf-toolchain-${{ matrix.os }}.tar.gz
