@@ -9,7 +9,10 @@
 #									#
 #########################################################################
 
-COMPILER_ROOT	?=	/usr/bin/
+QEMU_CMD      = qemu-system-i386
+
+#COMPILER_ROOT	?=	/usr/bin/
+COMPILER_ROOT	=	.toolchain/bin/i686-elf-
 PNAME		=	QEMU
 PLAT		=	Platform_$(PNAME)
 TOPDIR		=	..
@@ -177,3 +180,15 @@ depclean:
 	echo "" > $(DEPSFILE)
 
 -include $(DEPSFILE)
+
+
+# Following are specific to the QEMU version
+setup:
+	@chmod +x setup-toolchain.sh
+	@./setup-toolchain.sh
+
+run: xinu
+	$(QEMU_CMD) -nographic \
+		-kernel $(XINU) \
+		-netdev user,id=mynetdev \
+		-device e1000-82545em,netdev=mynetdev

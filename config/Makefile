@@ -2,10 +2,13 @@
 # Make the Xinu configuration program
 #
 
+TOOLCHAIN_BASE	=	../compile/.toolchain
+
 CC	= gcc
-LEX	= flex
-YACC	= bison -y	# Flag enables yacc-compatible filenames
+LEX	= $(TOOLCHAIN_BASE)/bin/flex
+YACC	= BISON_PKGDATADIR=$(TOOLCHAIN_BASE)/share/bison $(TOOLCHAIN_BASE)/bin/bison -y	# Flag enables yacc-compatible filenames
 CFLAGS	= 
+LFLAGS	=	-L$(TOOLCHAIN_BASE)/lib
 
 #
 # Name of the configuration program
