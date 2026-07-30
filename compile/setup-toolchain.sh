@@ -10,9 +10,9 @@ echo "Host system: $OS ($ARCH)"
 mkdir -p .toolchain
 
 if [ "$OS" = "Darwin" ] && [ "$ARCH" = "arm64" ]; then
-    FILE="i686-elf-toolchain-macos-14.tar.gz"
+    FILE="i686-elf-toolchain-macos-26.tar.gz"
 elif [ "$OS" = "Darwin" ] && [ "$ARCH" = "x86_64" ]; then
-    FILE="i686-elf-toolchain-macos-13.tar.gz"
+  echo "Intel Macs are not supported. Consider using the providewd Docker image to compile and run Xinu."
 else
     FILE="i686-elf-toolchain-ubuntu-22.04.tar.gz"
 fi

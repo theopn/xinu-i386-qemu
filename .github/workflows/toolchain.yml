@@ -10,18 +10,18 @@ jobs:
     strategy:
       fail-fast: false # Prevents one failure from cancelling the others
       matrix:
-        os: [ubuntu-22.04, macos-13, macos-14]
+        os: [ubuntu-22.04, macos-26]
 
     steps:
       - name: Install Build Dependencies (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
+        run: sudo apt-get update && sudo apt-get install -y build-essential m4 bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
 
       - name: Install Build Dependencies (macOS)
         if: runner.os == 'macOS'
         env:
           HOMEBREW_NO_REQUIRE_TAP_TRUST: 1 # Bypasses the GitHub runner AWS tap issue
-        run: brew install gcc binutils gmp mpfr libmpc texinfo flex bison
+        run: brew install gcc binutils gmp mpfr libmpc texinfo m4
 
       - name: Download GCC and Binutils Source
         run: |
@@ -36,12 +36,19 @@ jobs:
 
       - name: Build Binutils
         run: |
+          # Use Homebrew & some macOS native tools for compilation
+          export PATH="/opt/homebrew/opt/texinfo/bin:/opt/homebrew/opt/flex/bin:/opt/homebrew/opt/bison/bin:$PATH"
+          export CFLAGS="-Wno-error=implicit-function-declaration"
+          export CXXFLAGS="-Wno-error=implicit-function-declaration"
+          export CPPFLAGS="-I/opt/homebrew/include"
+          export LDFLAGS="-L/opt/homebrew/lib"
+
           mkdir build-binutils && cd build-binutils
           ../binutils-2.42/configure --target=i686-elf --prefix=$GITHUB_WORKSPACE/xinu-toolchain --with-sysroot --disable-nls --disable-werror
           make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
           make install-strip
 
-      - name: Build GCC (Freestanding C Compiler)
+      - name: Build GCC
         run: |
           export PATH="$GITHUB_WORKSPACE/xinu-toolchain/bin:$PATH"
           mkdir build-gcc && cd build-gcc
