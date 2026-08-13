@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false # Prevents one failure from cancelling the others
       matrix:
-        os: [ubuntu-22.04, macos-13, macos-14]
+        os: [ubuntu-22.04, macos-14]
 
     steps:
       - name: Install Build Dependencies (Linux)
@@ -41,7 +41,7 @@ jobs:
           make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
           make install-strip
 
-      - name: Build GCC (Freestanding C Compiler)
+      - name: Build GCC
         run: |
           export PATH="$GITHUB_WORKSPACE/xinu-toolchain/bin:$PATH"
           mkdir build-gcc && cd build-gcc
