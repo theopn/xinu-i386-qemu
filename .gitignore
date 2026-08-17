@@ -13,3 +13,4 @@ xinu.elf
 .vers_num
 version
 .touchall
+.toolchain
