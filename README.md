@@ -6,9 +6,27 @@ This repository also includes a Docker/Podman environment for reproducible build
 
 ## Compilation
 
+### Using Pre-built Compiler Binaries
+
+I have compiled and uploaded the pre-built compiler suite in the GitHub Release page.
+Use the following commands to download them into the Xinu source tree and compile.
+
+Prerequisite: `curl` and `tar`
+
+```sh
+cd compile
+
+make setup   # downloads the pre-built binaries from the GitHub Release page
+
+make clean && make
+
+# Run Xinu. Ctrl+A to exit QEMU
+make run
+```
+
 ### Using Docker/Podman
 
-The included `Dockerfile` provides a pre-configured Debian-based environment with the `i686-linux-gnu` cross-compilation toolchain.
+The included `Dockerfile` provides a pre-configured Debian-based environment.
 
 ```sh
 # 1. Build and start the container in the background
@@ -21,8 +39,11 @@ docker compose exec xinu-compile bash
 cd compile
 make clean && make
 
-# 4. Stop the background container when your session is finished
-docker compose down
+# 4. Run Xinu. Ctrl+A to exit QEMU
+make run
+
+# 5. Exit out of the Docker shell, stop the background container when your session is finished
+exit && docker compose down
 ```
 
 > Note: If are using Podman, simply replace `docker` with `podman` in the commands above.
@@ -50,10 +71,24 @@ nix-shell -p gnumake gcc_multi flex bison --run "make COMPILER_ROOT='' CC=gcc"
 
 Refer to the [`macos-native-compilation.md`](./macos-native-compilation.md) for more information.
 
+
+
 ## Running XINU with QEMU
 
-You can boot the Xinu kernel directly from the `compile` directory.
-Since the Docker image includes QEMU, you can run this either on your host system (with QEMU installed) or inside the container shell:
+> [!NOTE]
+> Make sure [QEMU](https://www.qemu.org/) (`qemu-system-i386`) is installed on your system.
+> Alternatively, if you used the Docker image to compile the kernel, you can do `make run` inside of the Docker container, as it contains QEMU.
+
+You can boot the Xinu kernel image directly from the `compile` directory.
+
+```sh
+cd compile
+make run   # Exit out of the VM with CTRL+A
+```
+
+Make sure your host machine is connected to the internet; Xinu's boot sequence requires an internet connection.
+
+`make run` is equivalent to running:
 
 ```sh
 qemu-system-i386 -nographic -kernel xinu.elf            \
@@ -61,12 +96,5 @@ qemu-system-i386 -nographic -kernel xinu.elf            \
                  -device e1000-82545em,netdev=mynetdev
 ```
 
-*Notes*:
-
-- `-nographic`: Emulates a serial console, which is where XINU directs its output.
-    See the [QEMU invocation documentation](https://www.qemu.org/docs/master/system/invocation.html) for details.
-- Other network backends may work, though `user` is the standard.
-    For more complex setups, refer to the [QEMU Wiki entry for networking](https://wiki.qemu.org/Documentation/Networking).
-- **Since network initialization is a core part of the XINU boot process, the system may hang or panic if the `e1000-82545em` is missing or misconfigured.**
-    See the [system/initialize.c](./system/initialize.c) for the implementation details.
+Advanced users may experiment with the QEMU flag.
 
