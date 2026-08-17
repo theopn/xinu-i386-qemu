@@ -12,7 +12,7 @@
 QEMU_CMD      = qemu-system-i386
 
 #COMPILER_ROOT	?=	/usr/bin/
-COMPILER_ROOT	=	.toolchain/bin/i686-elf-
+COMPILER_ROOT	?=	.toolchain/bin/i686-elf-
 PNAME		=	QEMU
 PLAT		=	Platform_$(PNAME)
 TOPDIR		=	..
