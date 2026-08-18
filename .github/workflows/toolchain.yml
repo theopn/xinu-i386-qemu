@@ -15,20 +15,27 @@ jobs:
     steps:
       - name: Install Build Dependencies (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
+        run: sudo apt-get update && sudo apt-get install -y build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo m4
 
       - name: Install Build Dependencies (macOS)
         if: runner.os == 'macOS'
         env:
           HOMEBREW_NO_REQUIRE_TAP_TRUST: 1 # Bypasses the GitHub runner AWS tap issue
-        run: brew install gcc binutils gmp mpfr libmpc texinfo flex bison
+        run: brew install gcc binutils gmp mpfr libmpc texinfo flex bison m4
 
-      - name: Download GCC and Binutils Source
+      - name: Download GCC, Binutils, and Flex, Bison, and gawk Source
         run: |
           wget https://ftp.gnu.org/gnu/binutils/binutils-2.42.tar.gz
           wget https://ftp.gnu.org/gnu/gcc/gcc-13.3.0/gcc-13.3.0.tar.gz
+          wget https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz
+          wget https://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.gz
+          wget https://ftp.gnu.org/gnu/gawk/gawk-5.3.0.tar.gz
+
           tar -xf binutils-2.42.tar.gz
           tar -xf gcc-13.3.0.tar.gz
+          tar -xf flex-2.6.4.tar.gz
+          tar -xf bison-3.8.2.tar.gz
+          tar -xf gawk-5.3.0.tar.gz
 
           # Tell GCC to fetch and bundle its own math libraries locally
           cd gcc-13.3.0
@@ -37,7 +44,7 @@ jobs:
       - name: Build Binutils
         run: |
           mkdir build-binutils && cd build-binutils
-          ../binutils-2.42/configure --target=i686-elf --prefix=$GITHUB_WORKSPACE/xinu-toolchain --with-sysroot --disable-nls --disable-werror
+          ../binutils-2.42/configure --target=i686-elf --prefix=$GITHUB_WORKSPACE/xinu-toolchain --with-sysroot --disable-nls --disable-werror --without-zstd
           make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
           make install-strip
 
@@ -45,27 +52,31 @@ jobs:
         run: |
           export PATH="$GITHUB_WORKSPACE/xinu-toolchain/bin:$PATH"
           mkdir build-gcc && cd build-gcc
-          ../gcc-13.3.0/configure --target=i686-elf --prefix=$GITHUB_WORKSPACE/xinu-toolchain --disable-nls --enable-languages=c --without-headers
+          ../gcc-13.3.0/configure --target=i686-elf --prefix=$GITHUB_WORKSPACE/xinu-toolchain --disable-nls --enable-languages=c --without-headers --without-zstd
           make all-gcc -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
           make install-strip-gcc
 
-      - name: Build Flex and Bison
+      - name: Build Flex, Bison, and Gawk
         run: |
-          wget https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz
-          wget https://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.gz
-          tar -xf flex-2.6.4.tar.gz
-          tar -xf bison-3.8.2.tar.gz
+          export PATH="$GITHUB_WORKSPACE/xinu-toolchain/bin:$PATH"
 
-          # Build Flex and its libfl.a library
+          # Build Flex and its libfl.a library (Forced to use universal /usr/bin/m4)
           cd flex-2.6.4
-          ./configure --prefix=$GITHUB_WORKSPACE/xinu-toolchain --disable-shared
+          ./configure --prefix=$GITHUB_WORKSPACE/xinu-toolchain --disable-shared M4=/usr/bin/m4
           make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
           make install
           cd ..
 
-          # Build Bison
+          # Build Bison (Forced to use universal /usr/bin/m4)
           cd bison-3.8.2
-          ./configure --prefix=$GITHUB_WORKSPACE/xinu-toolchain --disable-shared
+          ./configure --prefix=$GITHUB_WORKSPACE/xinu-toolchain --disable-shared M4=/usr/bin/m4
+          make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+          make install
+          cd ..
+
+          # Build Gawk
+          cd gawk-5.3.0
+          ./configure --prefix=$GITHUB_WORKSPACE/xinu-toolchain --disable-nls
           make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
           make install
           cd ..
