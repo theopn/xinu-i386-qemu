@@ -11,8 +11,18 @@
 
 QEMU_CMD      = qemu-system-i386
 
-#COMPILER_ROOT	?=	/usr/bin/
-COMPILER_ROOT	?=	.toolchain/bin/i686-elf-
+# Attempt to 
+TOOLCHAIN_BIN := $(CURDIR)/.toolchain/bin
+ifeq ($(wildcard $(TOOLCHAIN_BIN)/i686-elf-gcc),)
+	# No local toolchain found (Docker/Native). Use the environment or system tools.
+	COMPILER_ROOT ?= i686-linux-gnu-
+else
+	# Hermetic toolchain found! Force absolute path to bypass Make's internal PATH cache.
+	COMPILER_ROOT := $(TOOLCHAIN_BIN)/i686-elf-
+	export PATH := $(TOOLCHAIN_BIN):$(PATH)
+endif
+
+COMPILER_ROOT	?=	i686-elf-
 PNAME		=	QEMU
 PLAT		=	Platform_$(PNAME)
 TOPDIR		=	..
@@ -187,7 +197,7 @@ setup:
 	@chmod +x setup-toolchain.sh
 	@./setup-toolchain.sh
 
-run: xinu
+run:
 	$(QEMU_CMD) -nographic \
 		-kernel $(XINU) \
 		-netdev user,id=mynetdev \

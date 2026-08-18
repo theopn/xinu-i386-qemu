@@ -2,22 +2,22 @@
 # Make the Xinu configuration program
 #
 
-TOOLCHAIN_BASE	?=	../compile/.toolchain
-
-CC	= gcc
-
-# If pre-built .toolchain directory exists, use it.
-# Otherwise, it's native or Docker compilation
-ifeq ($(wildcard $(TOOLCHAIN_BASE)/bin/flex),)
-	LEX  = flex
-	YACC = bison -y
+TOOLCHAIN_BASE := $(CURDIR)/../compile/.toolchain
+TOOLCHAIN_BIN  := $(TOOLCHAIN_BASE)/bin
+ifeq ($(wildcard $(TOOLCHAIN_BIN)/flex),)
+	# No local toolchain found (Docker/Native). Fall back to system tools.
+	LEX    = flex
+	YACC   = bison -y
+	LFLAGS = # Use the system's default libfl
 else
-	LEX  = $(TOOLCHAIN_BASE)/bin/flex
-	YACC = BISON_PKGDATADIR=$(TOOLCHAIN_BASE)/share/bison $(TOOLCHAIN_BASE)/bin/bison -y
+	export BISON_PKGDATADIR := $(TOOLCHAIN_BASE)/share/bison
+	LEX    = $(TOOLCHAIN_BIN)/flex
+	YACC   = $(TOOLCHAIN_BIN)/bison -y
+	LFLAGS = -L$(TOOLCHAIN_BASE)/lib
 endif
 
+CC	= gcc
 CFLAGS	= 
-LFLAGS	=	-L$(TOOLCHAIN_BASE)/lib
 
 #
 # Name of the configuration program
