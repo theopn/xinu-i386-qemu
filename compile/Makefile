@@ -22,7 +22,6 @@ else
 	export PATH := $(TOOLCHAIN_BIN):$(PATH)
 endif
 
-COMPILER_ROOT	?=	i686-elf-
 PNAME		=	QEMU
 PLAT		=	Platform_$(PNAME)
 TOPDIR		=	..
@@ -121,7 +120,7 @@ export
 # The following inserts 'echo' when run on xinu00
 ECHO$(MACHINE) = echo; echo "On QEMU, the following command would be run:  "
 
-xinu:	Makefile rebuild $(BLDDIRS) $(DEFSFILE) $(DEPSFILE) $(CONFH) $(CONFC) $(LD_LIST)
+xinu:	check-toolchain Makefile rebuild $(BLDDIRS) $(DEFSFILE) $(DEPSFILE) $(CONFH) $(CONFC) $(LD_LIST)
 	@echo;echo 'Loading object files to produce GRUB bootable xinu'
 	@$(LD) $(LDFLAGS) $(LD_LIST) -o $(XINU)
 	
@@ -196,6 +195,14 @@ depclean:
 setup:
 	@chmod +x setup-toolchain.sh
 	@./setup-toolchain.sh
+
+check-toolchain:
+	@command -v $(CC) >/dev/null 2>&1 || { \
+		echo "error: compiler '$(CC)' not found."; \
+		echo "  If you're using pre-built binaries, run 'make setup' first."; \
+		echo "  If you're compiling natively, make sure it's installed and on your PATH."; \
+		exit 1; \
+		}
 
 run:
 	$(QEMU_CMD) -nographic \
