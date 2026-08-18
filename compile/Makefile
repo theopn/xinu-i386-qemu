@@ -194,7 +194,7 @@ depclean:
 # Following are specific to the QEMU version
 setup:
 	@chmod +x setup-toolchain.sh
-	@./setup-toolchain.sh
+	@./setup-toolchain.sh $(if $(FORCE),--force)
 
 check-toolchain:
 	@command -v $(CC) >/dev/null 2>&1 || { \
