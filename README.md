@@ -57,13 +57,19 @@ If you want to explore compiling Xinu natively, make sure that the following dep
 - `binutils` (`ld` and `objcopy`)
 - `flex` & `bison`    (required for `config/Makefile`)
 
-> Note: You may need to manually modify the `COMPILER_ROOT` and other constants the `Makefile` (in both `compile` and `config` directories) depending on the executable names provided by your distribution.
-
-
-For NixOS users:
+For example:
 
 ```sh
-nix-shell -p gnumake gcc_multi flex bison --run "make COMPILER_ROOT='' CC=gcc"
+# In Debian based distros
+sudo apt-get install gcc-i686-linux-gnu binutils-i686-linux-gnu bison flex
+```
+
+> Note: You may need to manually modify the `COMPILER_ROOT` and other constants the `Makefile` (in both `compile` and `config` directories) depending on the executable names provided by your distribution.
+
+For example, to be natively compiled in NixOS, used the following command:
+
+```sh
+nix-shell -p gnumake gcc_multi flex bison --run "make COMPILER_ROOT=''"
 ```
 
 
