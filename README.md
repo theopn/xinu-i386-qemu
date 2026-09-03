@@ -2,33 +2,53 @@
 
 This is a port of XINU with support for the i386 architecture and the Intel 82545EM network controller.
 
-This repository also includes a Docker/Podman environment for reproducible builds and documentation for native compilation across various platforms.
+This repository also includes a set of pre-built binaries, Docker environment for reproducible builds, and documentation for native compilation across various platforms.
+
+## Prerequisite
+
+1. Download and install [QEMU](https://www.qemu.org/download/). QEMU is packaged in most Linux distributions.
+    On macOS, use [Homebrew](https://brew.sh/) to install QEMU:
+    ```sh
+    brew install qemu
+    ```
+2. Clone and navigate to this repository:
+    ```sh
+    git clone https://github.com/theopn/xinu-i386-qemu.git
+    cd xinu-i386-qemu
+    ```
+3. Modify the Xinu source code as needed.
+4. Proceed with one of the compile options.
 
 ## Compilation
 
-### Using Pre-built Compiler Binaries
+### Option 1: Using Pre-built Compiler Binaries
 
-I have compiled and uploaded the pre-built compiler suite in the GitHub Release page.
-Use the following commands to download them into the Xinu source tree and compile.
+I have compiled and uploaded the pre-built compiler suite on the GitHub Release page.
+Use the following commands to download and extract them into the Xinu source tree.
 
 Prerequisite: `curl` and `tar`
 
 ```sh
 cd compile
 
-make setup   # downloads the pre-built binaries from the GitHub Release page
+# Downloads the pre-built binaries from the GitHub Release page
+make setup
 
+# Build Xinu
 make clean && make
 
-# Run Xinu. Ctrl+A to exit QEMU
+# Run Xinu. (Press Ctrl+A then x to exit QEMU)
 make run
 ```
 
-### Using Docker/Podman
+### Option 2: Using Docker/Podman
 
 The included `Dockerfile` provides a pre-configured Debian-based environment.
 
 ```sh
+# 0. Navigate to the top (base) directory
+cd ..
+
 # 1. Build and start the container in the background
 docker compose up -d --build
 
@@ -39,16 +59,18 @@ docker compose exec xinu-compile bash
 cd compile
 make clean && make
 
-# 4. Run Xinu. Ctrl+A to exit QEMU
+# 4. Run Xinu. (Press Ctrl+A then x to exit QEMU)
 make run
 
-# 5. Exit out of the Docker shell, stop the background container when your session is finished
-exit && docker compose down
+# 5. Exit out of the Docker shell, then stop the background container
+exit
+docker compose down
 ```
 
-> Note: If are using Podman, simply replace `docker` with `podman` in the commands above.
 
-### Native Compilation (Linux)
+> Note: If you are using Podman, simply replace `docker` with `podman` in the commands above.
+
+### Option 3-1: Native Compilation (Linux)
 
 If you want to explore compiling Xinu natively, make sure that the following dependencies are installed and available in your `$PATH`.
 
@@ -60,37 +82,24 @@ If you want to explore compiling Xinu natively, make sure that the following dep
 For example:
 
 ```sh
-# In Debian based distros
+# In Debian-based distributions:
 sudo apt-get install gcc-i686-linux-gnu binutils-i686-linux-gnu bison flex
 ```
 
-> Note: You may need to manually modify the `COMPILER_ROOT` and other constants the `Makefile` (in both `compile` and `config` directories) depending on the executable names provided by your distribution.
-
-For example, to be natively compiled in NixOS, used the following command:
-
-```sh
-nix-shell -p gnumake gcc_multi flex bison --run "make COMPILER_ROOT=''"
-```
+> Note: You may need to manually modify the `COMPILER_ROOT` and other constants in the `Makefile` (in both `compile` and `config` directories) depending on the executable names provided by your distribution.
+> For example, to natively compile in NixOS, use the following command:
+> ```sh
+> nix-shell -p gnumake gcc_multi flex bison --run "make COMPILER_ROOT=''"
+> ```
 
 
-### Native Compilation (macOS)
+### Option 3-2: Native Compilation (macOS)
 
 Refer to the [`macos-native-compilation.md`](./macos-native-compilation.md) for more information.
 
 
 
 ## Running XINU with QEMU
-
-> [!NOTE]
-> Make sure [QEMU](https://www.qemu.org/) (`qemu-system-i386`) is installed on your system.
-> Alternatively, if you used the Docker image to compile the kernel, you can do `make run` inside of the Docker container, as it contains QEMU.
-
-You can boot the Xinu kernel image directly from the `compile` directory.
-
-```sh
-cd compile
-make run   # Exit out of the VM with CTRL+A
-```
 
 Make sure your host machine is connected to the internet; Xinu's boot sequence requires an internet connection.
 
@@ -102,5 +111,5 @@ qemu-system-i386 -nographic -kernel xinu.elf            \
                  -device e1000-82545em,netdev=mynetdev
 ```
 
-Advanced users may experiment with the QEMU flag.
+Advanced users may experiment with the QEMU flags.
 
