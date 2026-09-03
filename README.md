@@ -23,6 +23,9 @@ This repository also includes a set of pre-built binaries, Docker environment fo
 
 ### Option 1: Using Pre-built Compiler Binaries
 
+> Note: Currently, this option is only supported by ARM-based Apple Silicon macOS and Debian-based distributions.
+> If you are using other systems, please use the other options.
+
 I have compiled and uploaded the pre-built compiler suite on the GitHub Release page.
 Use the following commands to download and extract them into the Xinu source tree.
 
@@ -41,7 +44,7 @@ make clean && make
 make run
 ```
 
-### Option 2: Using Docker/Podman
+### Option 2: Using Docker
 
 The included `Dockerfile` provides a pre-configured Debian-based environment.
 
@@ -99,7 +102,7 @@ Refer to the [`macos-native-compilation.md`](./macos-native-compilation.md) for 
 
 
 
-## Running XINU with QEMU
+## Extra Notes on Running XINU with QEMU
 
 Make sure your host machine is connected to the internet; Xinu's boot sequence requires an internet connection.
 
