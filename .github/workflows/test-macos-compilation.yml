@@ -1,0 +1,31 @@
+name: Test macOS Compilation
+
+on:
+  workflow_dispatch: # Allows manual triggering from the Actions tab
+
+jobs:
+  test-macos:
+    runs-on: macos-14
+    steps:
+      - name: Checkout the source
+        uses: actions/checkout@v4
+
+      - name: Setup compilers
+        run: |
+          cd compile
+          make setup
+
+      - name: Test compilation
+        run: |
+          cd compile
+          make clean
+          make
+
+      - name: Verify output
+        run: |
+          if [ -f "compile/xinu" ] || [ -f "compile/xinu.elf" ]; then
+            echo "Success, Xinu generated."
+          else
+            echo "Compilation failed."
+            exit 1
+          fi
