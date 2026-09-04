@@ -1,8 +1,9 @@
-FROM debian:12.5-slim
+FROM debian:12-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     bison \
+    curl \
     flex \
     gawk \
     libfl-dev \
