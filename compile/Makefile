@@ -15,8 +15,14 @@ QEMU_CMD      = qemu-system-i386
 
 # Set COMPILER_ROOT based on the existence of pre-built binaries
 TOOLCHAIN_BIN := $(CURDIR)/.toolchain/bin
-ifeq ($(wildcard $(TOOLCHAIN_BIN)/i686-elf-gcc),)
-	# No pre-built binaries found, use the system compiler.
+
+USE_PREBUILT := $(wildcard $(TOOLCHAIN_BIN)/i686-elf-gcc)
+ifdef XINU_SKIP_PREBUILT_TOOLCHAIN
+USE_PREBUILT :=
+endif
+
+ifeq ($(USE_PREBUILT),)
+	# Use system compiler
 	COMPILER_ROOT ?= i686-linux-gnu-
 else
 	# Use the pre-built binaries

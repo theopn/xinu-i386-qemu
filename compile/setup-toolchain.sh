@@ -6,6 +6,11 @@ ARCH=$(uname -m)
 VERSION="v1.0"
 BASE_URL="https://github.com/theopn/xinu-i386-qemu/releases/download/$VERSION"
 
+if [ -n "${XINU_SKIP_PREBUILT_TOOLCHAIN:-}" ]; then
+  echo "XINU_SKIP_PREBUILT_TOOLCHAIN environment is set."
+  exit 0
+fi
+
 if [ -x ".toolchain/bin/i686-elf-gcc" ] && [ "${1:-}" != "--force" ]; then
   echo "Toolchain already installed in .toolchain/bin/ (use 'make setup FORCE=1' to reinstall)"
   exit 0

@@ -13,5 +13,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 ENV COMPILER_ROOT=i686-linux-gnu-
+ENV XINU_SKIP_PREBUILT_TOOLCHAIN=1
 
 WORKDIR /xinu

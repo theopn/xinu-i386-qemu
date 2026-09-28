@@ -4,8 +4,14 @@
 
 TOOLCHAIN_BASE := $(CURDIR)/../compile/.toolchain
 TOOLCHAIN_BIN  := $(TOOLCHAIN_BASE)/bin
-ifeq ($(wildcard $(TOOLCHAIN_BIN)/flex),)
-	# No local toolchain found (Docker/Native). Fall back to system tools.
+
+USE_PREBUILT := $(wildcard $(TOOLCHAIN_BIN)/i686-elf-gcc)
+ifdef XINU_SKIP_PREBUILT_TOOLCHAIN
+USE_PREBUILT :=
+endif
+
+ifeq ($(USE_PREBUILT),)
+	# use system tools
 	LEX    = flex
 	YACC   = bison -y
 	LFLAGS = # Use the system's default libfl
