@@ -17,6 +17,7 @@ ifeq ($(USE_PREBUILT),)
 	LFLAGS = # Use the system's default libfl
 else
 	export BISON_PKGDATADIR := $(TOOLCHAIN_BASE)/share/bison
+	export M4 := $(TOOLCHAIN_BIN)/m4
 	LEX    = $(TOOLCHAIN_BIN)/flex
 	YACC   = $(TOOLCHAIN_BIN)/bison -y
 	LFLAGS = -L$(TOOLCHAIN_BASE)/lib
