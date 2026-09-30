@@ -1,6 +1,6 @@
 # Natively Compiling Xinu on macOS
 
-If you would like to natively compile Xinu instead of using the provided Docker image, refer to this document.
+If you would like to natively compile Xinu instead of using the provided pre-built compilers, refer to this document.
 
 Testing environment:
 
@@ -68,9 +68,4 @@ However, it is possible to use them to compile Xinu by compiling the config file
         gcc -o config y.tab.c
         ```
 2. Navigate to `compile/` and run `make COMPILER_ROOT=i686-elf-`
-
-
-## Disclaimer
-
-The maintainer of this repository is not affiliated with Homebrew, and the packages mentioned in this document could become unavailable in the future, though this is unlikely.
 
