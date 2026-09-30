@@ -1,4 +1,4 @@
-This directory holds Xinu sources for Virtual Box.  They are derived from
+This directory holds Xinu sources for QEMU.  They are derived from
 the Galileo version described in:
 
 	Douglas Comer, Operating System Design -- The Xinu Approach,
@@ -14,6 +14,8 @@ The changes are:
  2) The Ethernet driver is for an Intel 82545EM chip, which is a form of
     Intel's E1000E Ethernet design.  The internals of the driver differ
     completely from the driver used with the Ethernet on the Galileo SoC.
+    The driver uses memory-mapped I/O to access the device's registers
+    (the Virtual Box version of this driver used port-mapped I/O instead).
 
  3) The startup sequence (file start.S) differs from the Galileo startup
     sequence.  It may be possible to move toward a more common form; we
@@ -32,3 +34,5 @@ The changes are:
 
  6) The code includes a pipe device, and the shell has pipes.
 
+ 7) The QEMU version includes step-by-step compilation documents and
+    compilation tools (pre-built binaries and Docker image).
